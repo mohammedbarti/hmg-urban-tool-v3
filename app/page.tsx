@@ -20,28 +20,46 @@ const handleClick = () => {
   const km2 = parseFloat(area);
   const walk = parseInt(walkabilityRadius) || 600;
 
+  const percentElderly = parseFloat(elderly) || 0;
+  const percentChildren = parseFloat(children) || 0;
+  const percentChronic = parseFloat(chronic) || 0;
+  const percentFemale = parseFloat(female) || 0;
+
   if (isNaN(pop) || isNaN(km2)) return;
 
   const results: string[] = [];
 
-  // Ambulance: 1 per 2,000
+  // Ambulance
   results.push(`🚑 Ambulances: ${Math.ceil(pop / 2000)}`);
 
-  // Primary Healthcare Centers: 1 per 10,000
-  results.push(`🏥 Primary Healthcare Centers: ${Math.ceil(pop / 10000)}`);
+  // PHCs
+  let phcs = Math.ceil(pop / 10000);
+  if (percentChildren > 25) phcs += 1;
+  results.push(`🏥 Primary Healthcare Centers: ${phcs}`);
 
-  // Emergency Pods: 1 per 10,000
+  // Emergency Pods
   results.push(`🆘 Emergency Pods: ${Math.ceil(pop / 10000)}`);
 
-  if (deployment === 'Ideal Model') {
-    results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 5000)} (1 per 5,000 people)`);
-    results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 30)} (1 per 30 km²)`);
-  } else {
-    results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 25000)} (1 per 25,000 people)`);
-    results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 20)} (1 per 20 km²)`);
+  // Telehealth Booths
+  let telehealth = deployment === 'Ideal Model'
+    ? Math.ceil(pop / 5000)
+    : Math.ceil(pop / 25000);
+  if (percentElderly > 15) telehealth += 1;
+  results.push(`🧑‍💻 Telehealth Booths: ${telehealth} (${deployment === 'Ideal Model' ? '1 per 5,000 people' : '1 per 25,000 people'})`);
+
+  // Mobile Clinics
+  let mobileClinics = deployment === 'Ideal Model'
+    ? Math.ceil(km2 / 30)
+    : Math.ceil(km2 / 20);
+  if (percentChronic > 20) mobileClinics += 1;
+  results.push(`🚐 Mobile Clinics: ${mobileClinics} (${deployment === 'Ideal Model' ? '1 per 30 km²' : '1 per 20 km²'})`);
+
+  // Women's Clinic Suggestion
+  if (percentFemale > 60) {
+    results.push(`🏩 Women’s Health Center: Recommended (High % Female Population)`);
   }
 
-  // Helipad for rural areas
+  // Helipad
   if (setting === 'Rural') {
     results.push('🚁 Helipad: 1 (for remote access)');
   }
