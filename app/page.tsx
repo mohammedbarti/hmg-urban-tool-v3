@@ -18,7 +18,6 @@ export default function Home() {
   const calculate = () => {
     const pop = parseInt(population);
     const km2 = parseFloat(area);
-    const walk = parseFloat(walkability);
     const eld = parseFloat(elderly);
     const kids = parseFloat(children);
     const chr = parseFloat(chronic);
@@ -36,7 +35,7 @@ export default function Home() {
       ? Math.ceil(pop / 25000)
       : Math.ceil(pop / 5000);
 
-    // Adjustments based on demographics
+    // Demographic modifiers
     if (eld > 15) telehealthBooths += 1;
     if (chr > 20) mobileClinics += 1;
     if (kids > 25) phcs += 1;
@@ -119,10 +118,11 @@ export default function Home() {
           </ul>
         </div>
       )}
-    </div>
- <div style={{ position: 'fixed', bottom: 10, right: 20, fontSize: '14px', color: '#666' }}>
-  Made by: Dr. Mohammed AlBarti – Corporate Business Development
-</div>
 
+      {/* Footer note */}
+      <div style={{ position: 'fixed', bottom: 10, right: 20, fontSize: '14px', color: '#666' }}>
+        Made by: Dr. Mohammed AlBarti – Corporate Business Development
+      </div>
+    </div>
   );
 }
