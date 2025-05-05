@@ -1,95 +1,144 @@
 'use client';
-
 import React, { useState } from 'react';
 
 const Page = () => {
   const [population, setPopulation] = useState('');
   const [area, setArea] = useState('');
-  const [walkability, setWalkability] = useState('');
-  const [deploymentModel, setDeploymentModel] = useState('low-cost');
-  const [results, setResults] = useState(null);
+  const [walkabilityRadius, setWalkabilityRadius] = useState('');
+  const [elderly, setElderly] = useState('');
+  const [children, setChildren] = useState('');
+  const [chronic, setChronic] = useState('');
+  const [female, setFemale] = useState('');
+  const [density, setDensity] = useState('Low');
+  const [growth, setGrowth] = useState('Stable');
+  const [setting, setSetting] = useState('Urban');
+  const [deployment, setDeployment] = useState('Low-Cost Model');
+  const [recommendations, setRecommendations] = useState<string[]>([]);
 
-  const calculate = () => {
+  const handleClick = () => {
     const pop = parseInt(population);
     const km2 = parseFloat(area);
-    const walkRadius = parseInt(walkability);
+    const walk = parseInt(walkabilityRadius) || 600;
 
-    if (isNaN(pop) || isNaN(km2) || isNaN(walkRadius)) {
-      alert('Please fill in all fields correctly.');
-      return;
-    }
+    if (isNaN(pop) || isNaN(km2)) return;
 
-    const ambulances = Math.ceil(pop / 2000);
+    const results: string[] = [];
 
-    let adjustedMobileClinics;
-    let adjustedTelehealthBooths;
+    // Ambulance: 1 per 2,000
+    results.push(`🚑 Ambulances: ${Math.ceil(pop / 2000)}`);
 
-    if (deploymentModel === 'low-cost') {
-      adjustedMobileClinics = Math.ceil(km2 / 20);
-      adjustedTelehealthBooths = Math.ceil(pop / 25000);
+    // PHCs: 1 per 10,000
+    results.push(`🏥 Primary Healthcare Centers: ${Math.ceil(pop / 10000)}`);
+
+    // Emergency Pods: 1 per 10,000
+    results.push(`🆘 Emergency Pods: ${Math.ceil(pop / 10000)}`);
+
+    // Telehealth Booths
+    if (deployment === 'Ideal Model') {
+      results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 15000)} (1 per 15,000 people)`);
     } else {
-      adjustedMobileClinics = Math.ceil(km2 / 10);
-      adjustedTelehealthBooths = Math.ceil(pop / 12500);
+      results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 25000)} (1 per 25,000 people)`);
     }
 
-    const phcs = Math.ceil(pop / 10000);
-    const emergencyPods = Math.ceil(pop / 5000);
+    // Mobile Clinics logic
+    if (deployment === 'Low-Cost Model') {
+      results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 20)} (1 per 20 km²)`);
+    } else {
+      results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 10)} (1 per 10 km²)`);
+    }
 
-    setResults({
-      ambulances,
-      adjustedMobileClinics,
-      adjustedTelehealthBooths,
-      phcs,
-      emergencyPods,
-    });
+    // Add Helipad if rural
+    if (setting === 'Rural') {
+      results.push('🚁 Helipad: 1 (for remote access)');
+    }
+
+    setRecommendations(results);
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '2rem', fontFamily: 'Arial' }}>
-      <img src="/logo.png" alt="Logo" style={{ position: 'absolute', top: 10, left: 10, height: 40 }} />
+    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', maxWidth: 800, margin: '0 auto' }}>
+      <img src="/logo.png" alt="Logo" style={{ height: 40, marginBottom: '1rem' }} />
 
-      <h1>HMG Urban Planning Tool</h1>
+      <h1 style={{ textAlign: 'center' }}>HMG Urban Planning Tool</h1>
+      <p style={{ textAlign: 'center' }}>Enter basic community info to get infrastructure recommendations.</p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '2rem', textAlign: 'left' }}>
-        <div>
-          <label>Population:</label>
-          <input value={population} onChange={(e) => setPopulation(e.target.value)} type="number" placeholder="e.g., 20000" style={{ width: '100%', padding: '0.5rem' }} />
-        </div>
-        <div>
-          <label>Area (km²):</label>
-          <input value={area} onChange={(e) => setArea(e.target.value)} type="number" placeholder="e.g., 50" style={{ width: '100%', padding: '0.5rem' }} />
-        </div>
-        <div>
-          <label>Walkability Radius (meters):</label>
-          <input value={walkability} onChange={(e) => setWalkability(e.target.value)} type="number" placeholder="e.g., 500" style={{ width: '100%', padding: '0.5rem' }} />
-        </div>
-        <div>
-          <label>Deployment Model:</label>
-          <select value={deploymentModel} onChange={(e) => setDeploymentModel(e.target.value)} style={{ width: '100%', padding: '0.5rem' }}>
-            <option value="low-cost">Low-Cost Model</option>
-            <option value="ideal">Ideal Model</option>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+        <label style={{ flex: '1 1 45%' }}>
+          Population:
+          <input value={population} onChange={(e) => setPopulation(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          Area (km²):
+          <input value={area} onChange={(e) => setArea(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          Walkability Radius (meters):
+          <input value={walkabilityRadius} onChange={(e) => setWalkabilityRadius(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          % Elderly Population:
+          <input value={elderly} onChange={(e) => setElderly(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          % Children Population:
+          <input value={children} onChange={(e) => setChildren(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          % Chronic / Regular Care:
+          <input value={chronic} onChange={(e) => setChronic(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          % Female:
+          <input value={female} onChange={(e) => setFemale(e.target.value)} type="number" />
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          Density:
+          <select value={density} onChange={(e) => setDensity(e.target.value)}>
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
           </select>
-        </div>
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          Growth Status:
+          <select value={growth} onChange={(e) => setGrowth(e.target.value)}>
+            <option>Stable</option>
+            <option>Growing</option>
+            <option>Declining</option>
+          </select>
+        </label>
+        <label style={{ flex: '1 1 45%' }}>
+          Setting Type:
+          <select value={setting} onChange={(e) => setSetting(e.target.value)}>
+            <option>Urban</option>
+            <option>Rural</option>
+          </select>
+        </label>
+        <label style={{ flex: '1 1 100%' }}>
+          Deployment Model:
+          <select value={deployment} onChange={(e) => setDeployment(e.target.value)}>
+            <option>Low-Cost Model</option>
+            <option>Ideal Model</option>
+          </select>
+        </label>
       </div>
 
-      <button onClick={calculate} style={{ marginTop: '2rem', padding: '1rem 2rem', fontSize: '1rem', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
+      <button onClick={handleClick} style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', marginBottom: '2rem' }}>
         Calculate
       </button>
 
-      {results && (
-        <div style={{ marginTop: '3rem', textAlign: 'left' }}>
+      {recommendations.length > 0 && (
+        <div>
           <h2>Recommendations</h2>
           <ul>
-            <li>🚑 Ambulances: {results.ambulances}</li>
-            <li>🏥 Primary Healthcare Centers: {results.phcs}</li>
-            <li>🆘 Emergency Pods: {results.emergencyPods}</li>
-            <li>🚐 Mobile Clinics: {results.adjustedMobileClinics} ({deploymentModel === 'low-cost' ? '1 per 20 km²' : '1 per 10 km²'})</li>
-            <li>📡 Telehealth Booths: {results.adjustedTelehealthBooths} ({deploymentModel === 'low-cost' ? '1 per 25,000 people' : '1 per 12,500 people'})</li>
+            {recommendations.map((rec, i) => (
+              <li key={i}>{rec}</li>
+            ))}
           </ul>
         </div>
       )}
 
-      <footer style={{ marginTop: '4rem', fontSize: '0.9rem', color: '#666', textAlign: 'right' }}>
+      <footer style={{ marginTop: '2rem', fontSize: '0.85rem', color: '#555', textAlign: 'center' }}>
         Made by: Dr. Mohammed alBarti – Corporate Business Development
       </footer>
     </div>
