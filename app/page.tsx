@@ -120,5 +120,9 @@ export default function Home() {
         </div>
       )}
     </div>
+ <div style={{ position: 'fixed', bottom: 10, right: 20, fontSize: '14px', color: '#666' }}>
+  Made by: Dr. Mohammed AlBarti – Corporate Business Development
+</div>
+
   );
 }
