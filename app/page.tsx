@@ -15,45 +15,39 @@ const Page = () => {
   const [deployment, setDeployment] = useState('Low-Cost Model');
   const [recommendations, setRecommendations] = useState<string[]>([]);
 
-  const handleClick = () => {
-    const pop = parseInt(population);
-    const km2 = parseFloat(area);
-    const walk = parseInt(walkabilityRadius) || 600;
+const handleClick = () => {
+  const pop = parseInt(population);
+  const km2 = parseFloat(area);
+  const walk = parseInt(walkabilityRadius) || 600;
 
-    if (isNaN(pop) || isNaN(km2)) return;
+  if (isNaN(pop) || isNaN(km2)) return;
 
-    const results: string[] = [];
+  const results: string[] = [];
 
-    // Ambulance: 1 per 2,000
-    results.push(`🚑 Ambulances: ${Math.ceil(pop / 2000)}`);
+  // Ambulance: 1 per 2,000
+  results.push(`🚑 Ambulances: ${Math.ceil(pop / 2000)}`);
 
-    // PHCs: 1 per 10,000
-    results.push(`🏥 Primary Healthcare Centers: ${Math.ceil(pop / 10000)}`);
+  // Primary Healthcare Centers: 1 per 10,000
+  results.push(`🏥 Primary Healthcare Centers: ${Math.ceil(pop / 10000)}`);
 
-    // Emergency Pods: 1 per 10,000
-    results.push(`🆘 Emergency Pods: ${Math.ceil(pop / 10000)}`);
+  // Emergency Pods: 1 per 10,000
+  results.push(`🆘 Emergency Pods: ${Math.ceil(pop / 10000)}`);
 
-    // Telehealth Booths
-    if (deployment === 'Ideal Model') {
-      results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 15000)} (1 per 15,000 people)`);
-    } else {
-      results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 25000)} (1 per 25,000 people)`);
-    }
+  if (deployment === 'Ideal Model') {
+    results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 5000)} (1 per 5,000 people)`);
+    results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 30)} (1 per 30 km²)`);
+  } else {
+    results.push(`🧑‍💻 Telehealth Booths: ${Math.ceil(pop / 25000)} (1 per 25,000 people)`);
+    results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 20)} (1 per 20 km²)`);
+  }
 
-    // Mobile Clinics logic
-    if (deployment === 'Low-Cost Model') {
-      results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 20)} (1 per 20 km²)`);
-    } else {
-      results.push(`🚐 Mobile Clinics: ${Math.ceil(km2 / 10)} (1 per 10 km²)`);
-    }
+  // Helipad for rural areas
+  if (setting === 'Rural') {
+    results.push('🚁 Helipad: 1 (for remote access)');
+  }
 
-    // Add Helipad if rural
-    if (setting === 'Rural') {
-      results.push('🚁 Helipad: 1 (for remote access)');
-    }
-
-    setRecommendations(results);
-  };
+  setRecommendations(results);
+};
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif', maxWidth: 800, margin: '0 auto' }}>
